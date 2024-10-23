@@ -6,33 +6,30 @@
     <title>BCC Chatbot Interface</title>
 </head>
 <body>
-    <h1>Chat with BCC Chatbot</h1>
-    <textarea id="userInput" placeholder="Type your message here..."></textarea>
-    <br><br>
+    <h1>Chat with BCC Chatbot<</h1>
+    <textarea id="userInput" rows="4" cols="50" placeholder="Type your message here..."></textarea><br>
     <button onclick="sendMessage()">Send</button>
-    <div id="chatOutput"></div>
+    <p><strong>chatOutput:</strong></p>
+    <p id="chatbotReply"></p>
 
     <script>
-        function sendMessage() {
-            const message = document.getElementById('userInput').value;
-            fetch('/chat', {
+        async function sendMessage() {
+            const userMessage = document.getElementById('userInput').value;
+
+            const response = await fetch('/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ message: message }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.reply) {
-                    document.getElementById('chatOutput').innerHTML = '<p>' + data.reply + '</p>';
-                } else {
-                    document.getElementById('chatOutput').innerHTML = '<p>Error: ' + data.error + '</p>';
-                }
-            })
-            .catch(error => {
-                document.getElementById('chatOutput').innerHTML = '<p>Network error: ' + error + '</p>';
+                body: JSON.stringify({ message: userMessage }),
             });
+
+            const data = await response.json();
+            if (data.reply) {
+                document.getElementById('chatbotReply').innerText = data.reply;
+            } else {
+                document.getElementById('chatbotReply').innerText = 'Error: ' + data.error;
+            }
         }
     </script>
 </body>
