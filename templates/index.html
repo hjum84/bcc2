@@ -3,33 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPT 챗봇</title>
+    <title>BCC Chatbot Interface</title>
 </head>
 <body>
-    <h1>GPT 챗봇에 오신 것을 환영합니다!</h1>
-    <textarea id="userInput" rows="4" cols="50" placeholder="질문을 입력하세요..."></textarea><br>
-    <button onclick="sendMessage()">보내기</button>
-    <p><strong>챗봇 답변:</strong></p>
-    <p id="chatbotReply"></p>
+    <h1>Chat with BCC Chatbot</h1>
+    <textarea id="userInput" placeholder="Type your message here..."></textarea>
+    <br><br>
+    <button onclick="sendMessage()">Send</button>
+    <div id="chatOutput"></div>
 
     <script>
-        async function sendMessage() {
-            const userMessage = document.getElementById('userInput').value;
-
-            const response = await fetch('/chat', {
+        function sendMessage() {
+            const message = document.getElementById('userInput').value;
+            fetch('/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ message: userMessage }),
+                body: JSON.stringify({ message: message }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.reply) {
+                    document.getElementById('chatOutput').innerHTML = '<p>' + data.reply + '</p>';
+                } else {
+                    document.getElementById('chatOutput').innerHTML = '<p>Error: ' + data.error + '</p>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('chatOutput').innerHTML = '<p>Network error: ' + error + '</p>';
             });
-
-            const data = await response.json();
-            if (data.reply) {
-                document.getElementById('chatbotReply').innerText = data.reply;
-            } else {
-                document.getElementById('chatbotReply').innerText = 'Error: ' + data.error;
-            }
         }
     </script>
 </body>
